@@ -14,10 +14,10 @@ tmux_get() {
     [ -n "$value" ] && echo "$value" || echo "$2"
 }
 
-key="$(tmux_get '@fzf-url-bind' 'u')"
-history_limit="$(tmux_get '@fzf-url-history-limit' 'screen')"
-extra_filter="$(tmux_get '@fzf-url-extra-filter' '')"
-custom_open="$(tmux_get '@fzf-url-open' '')"
+key="$(tmux_get '@fzf-path-bind' 'p')"
+history_limit="$(tmux_get '@fzf-path-history-limit' 'screen')"
+extra_filter="$(tmux_get '@fzf-path-extra-filter' '')"
+custom_open="$(tmux_get '@fzf-path-open' '')"
 echo "$extra_filter" > /tmp/filter
 
-tmux bind-key "$key" run -b "$SCRIPT_DIR/fzf-url.sh '$extra_filter' $history_limit '$custom_open'";
+tmux bind-key "$key" run -b "$SCRIPT_DIR/fzf-path.sh '$extra_filter' $history_limit '$custom_open'";

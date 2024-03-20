@@ -7,7 +7,7 @@
 get_fzf_options() {
     local fzf_options
     local fzf_default_options='-w 100% -h 50% --multi -0 --no-preview'
-    fzf_options="$(tmux show -gqv '@fzf-url-fzf-options')"
+    fzf_options="$(tmux show -gqv '@fzf-path-fzf-options')"
     [ -n "$fzf_options" ] && echo "$fzf_options" || echo "$fzf_default_options"
 }
 
@@ -23,8 +23,8 @@ open_url() {
         nohup xdg-open "$@"
     elif hash open &>/dev/null; then
         nohup open "$@"
-    elif [[ -n $BROWSER ]]; then
-        nohup "$BROWSER" "$@"
+    elif [[ -n $EDITOR ]]; then
+        nohup "$EDITOR" "$@"
     fi
 }
 
@@ -37,7 +37,7 @@ else
     content="$(tmux capture-pane -J -p -e -S -"$limit")"
 fi
 
-urls=$(echo "$content" |grep -oE '(https?|ftp|file):/?//[-A-Za-z0-9+&@#/%?=~_|!:,.;]*[-A-Za-z0-9+&@#/%=~_|]')
+urls=$(echo "$content" |grep -oE '/[^"]*')
 wwws=$(echo "$content" |grep -oE '(http?s://)?www\.[a-zA-Z](-?[a-zA-Z0-9])+\.[a-zA-Z]{2,}(/\S+)*' | grep -vE '^https?://' |sed 's/^\(.*\)$/http:\/\/\1/')
 ips=$(echo "$content" |grep -oE '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}(:[0-9]{1,5})?(/\S+)*' |sed 's/^\(.*\)$/http:\/\/\1/')
 gits=$(echo "$content" |grep -oE '(ssh://)?git@\S*' | sed 's/:/\//g' | sed 's/^\(ssh\/\/\/\)\{0,1\}git@\(.*\)$/https:\/\/\2/')
@@ -52,7 +52,7 @@ items=$(printf '%s\n' "${urls[@]}" "${wwws[@]}" "${gh[@]}" "${ips[@]}" "${gits[@
     sort -u |
     nl -w3 -s '  '
 )
-[ -z "$items" ] && tmux display 'tmux-fzf-url: no URLs found' && exit
+[ -z "$items" ] && tmux display 'tmux-fzf-path: no paths found' && exit
 
 fzf_filter <<< "$items" | awk '{print $2}' | \
     while read -r chosen; do
